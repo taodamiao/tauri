@@ -7,7 +7,10 @@
 pub use anyhow::Result;
 use heck::AsShoutySnakeCase;
 
-use tauri_utils::resources::{external_binaries, resource_relpath, ResourcePaths};
+use tauri_utils::{
+  config::BundleResources,
+  resources::{external_binaries, ResourcePaths},
+};
 
 use std::path::{Path, PathBuf};
 
@@ -68,11 +71,10 @@ fn copy_binaries(
 
 /// Copies resources to a path.
 fn copy_resources(resources: ResourcePaths<'_>, path: &Path) -> Result<()> {
-  for src in resources {
-    let src = src?;
-    println!("cargo:rerun-if-changed={}", src.display());
-    let dest = path.join(resource_relpath(&src));
-    copy_file(&src, dest)?;
+  for resource in resources.into_iter() {
+    let resource = resource?;
+    println!("cargo:rerun-if-changed={}", resource.path().display());
+    copy_file(resource.path(), path.join(resource.target()))?;
   }
   Ok(())
 }
@@ -343,13 +345,23 @@ pub fn try_build(attributes: Attributes) -> Result<()> {
   }
 
   #[allow(unused_mut, clippy::redundant_clone)]
-  let mut resources = config.tauri.bundle.resources.clone().unwrap_or_default();
+  let mut resources = config
+    .tauri
+    .bundle
+    .resources
+    .clone()
+    .unwrap_or_else(|| BundleResources::List(Vec::new()));
   #[cfg(windows)]
   if let Some(fixed_webview2_runtime_path) = &config.tauri.bundle.windows.webview_fixed_runtime_path
   {
     resources.push(fixed_webview2_runtime_path.display().to_string());
   }
-  copy_resources(ResourcePaths::new(resources.as_slice(), true), target_dir)?;
+  match resources {
+    BundleResources::List(res) => {
+      copy_resources(ResourcePaths::new(res.as_slice(), true), target_dir)?
+    }
+    BundleResources::Map(map) => copy_resources(ResourcePaths::from_map(&map, true), target_dir)?,
+  }
 
   #[cfg(target_os = "macos")]
   {

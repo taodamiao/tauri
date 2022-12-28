@@ -36,7 +36,7 @@ use tauri_utils::config::parse::is_configuration_file;
 use super::{AppSettings, ExitReason, Interface};
 use crate::helpers::{
   app_paths::{app_dir, tauri_dir},
-  config::{reload as reload_config, wix_settings, Config},
+  config::{reload as reload_config, wix_settings, BundleResources, Config},
 };
 
 mod cargo_config;
@@ -954,7 +954,9 @@ fn tauri_config_to_bundle_settings(
   let windows_icon_path = PathBuf::from("");
 
   #[allow(unused_mut)]
-  let mut resources = config.resources.unwrap_or_default();
+  let mut resources = config
+    .resources
+    .unwrap_or(BundleResources::List(Vec::new()));
   #[allow(unused_mut)]
   let mut depends = config.deb.depends.unwrap_or_default();
 
@@ -1005,15 +1007,17 @@ fn tauri_config_to_bundle_settings(
     None => config.macos.provider_short_name,
   };
 
+  let (resources, resources_map) = match resources {
+    BundleResources::List(paths) => (Some(paths), None),
+    BundleResources::Map(map) => (None, Some(map)),
+  };
+
   Ok(BundleSettings {
     identifier: Some(config.identifier),
     publisher: config.publisher,
     icon: Some(config.icon),
-    resources: if resources.is_empty() {
-      None
-    } else {
-      Some(resources)
-    },
+    resources,
+    resources_map,
     copyright: config.copyright,
     category: match config.category {
       Some(category) => Some(AppCategory::from_str(&category).map_err(|e| match e {
