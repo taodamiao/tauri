@@ -1,5 +1,12 @@
 # Changelog
 
+## \[2.0.0-alpha.2]
+
+- Return `bool` in the invoke handler.
+  - [05dad087](https://www.github.com/tauri-apps/tauri/commit/05dad0876842e2a7334431247d49365cee835d3e) feat: initial work for iOS plugins ([#6205](https://www.github.com/tauri-apps/tauri/pull/6205)) on 2023-02-11
+- Pin `time` to `0.3.15`.
+  - [3d16461b](https://www.github.com/tauri-apps/tauri/commit/3d16461b68583ba7db037fbc217786e79b46ddf2) fix(core): pin time to 0.3.15 ([#6312](https://www.github.com/tauri-apps/tauri/pull/6312)) on 2023-02-19
+
 ## \[2.0.0-alpha.1]
 
 - Bump the MSRV to 1.64.
