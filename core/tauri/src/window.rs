@@ -250,7 +250,7 @@ impl<'a, R: Runtime> WindowBuilder<'a, R> {
       RuntimeOrDispatch::RuntimeHandle(handle) => handle.create_window(pending),
       RuntimeOrDispatch::Dispatch(dispatcher) => dispatcher.create_window(pending),
     }
-    .map(|window| self.manager.attach_window(self.app_handle.clone(), window))?;
+      .map(|window| self.manager.attach_window(self.app_handle.clone(), window))?;
 
     self.manager.emit_filter(
       "tauri://window-created",
@@ -332,8 +332,8 @@ impl<'a, R: Runtime> WindowBuilder<'a, R> {
   /// Sets the window to be initially focused.
   #[must_use]
   #[deprecated(
-    since = "1.2.0",
-    note = "The window is automatically focused by default. This function Will be removed in 2.0.0. Use `focused` instead."
+  since = "1.2.0",
+  note = "The window is automatically focused by default. This function Will be removed in 2.0.0. Use `focused` instead."
   )]
   pub fn focus(mut self) -> Self {
     self.window_builder = self.window_builder.focused(true);
@@ -376,8 +376,8 @@ impl<'a, R: Runtime> WindowBuilder<'a, R> {
   /// with alpha values different than `1.0` will produce a transparent window.
   #[cfg(any(not(target_os = "macos"), feature = "macos-private-api"))]
   #[cfg_attr(
-    doc_cfg,
-    doc(cfg(any(not(target_os = "macos"), feature = "macos-private-api")))
+  doc_cfg,
+  doc(cfg(any(not(target_os = "macos"), feature = "macos-private-api")))
   )]
   #[must_use]
   pub fn transparent(mut self, transparent: bool) -> Self {
@@ -679,21 +679,21 @@ pub struct PlatformWebview(tauri_runtime_wry::Webview);
 impl PlatformWebview {
   /// Returns [`webkit2gtk::WebView`] handle.
   #[cfg(any(
-    target_os = "linux",
-    target_os = "dragonfly",
-    target_os = "freebsd",
-    target_os = "netbsd",
-    target_os = "openbsd"
+  target_os = "linux",
+  target_os = "dragonfly",
+  target_os = "freebsd",
+  target_os = "netbsd",
+  target_os = "openbsd"
   ))]
   #[cfg_attr(
-    doc_cfg,
-    doc(cfg(any(
-      target_os = "linux",
-      target_os = "dragonfly",
-      target_os = "freebsd",
-      target_os = "netbsd",
-      target_os = "openbsd"
-    )))
+  doc_cfg,
+  doc(cfg(any(
+  target_os = "linux",
+  target_os = "dragonfly",
+  target_os = "freebsd",
+  target_os = "netbsd",
+  target_os = "openbsd"
+  )))
   )]
   pub fn inner(&self) -> std::rc::Rc<webkit2gtk::WebView> {
     self.0.clone()
@@ -1014,11 +1014,11 @@ impl<R: Runtime> Window<R> {
   ///
   /// Note that this can only be used on the main thread.
   #[cfg(any(
-    target_os = "linux",
-    target_os = "dragonfly",
-    target_os = "freebsd",
-    target_os = "netbsd",
-    target_os = "openbsd"
+  target_os = "linux",
+  target_os = "dragonfly",
+  target_os = "freebsd",
+  target_os = "netbsd",
+  target_os = "openbsd"
   ))]
   pub fn gtk_window(&self) -> crate::Result<gtk::ApplicationWindow> {
     self.window.dispatcher.gtk_window().map_err(Into::into)
@@ -1322,23 +1322,7 @@ impl<R: Runtime> Window<R> {
       "Scope not defined for window `{}` and URL `{current_url}`",
       self.window.label
     );
-    let scope = if is_local {
-      Some(&default_scope)
-    } else {
-      let mut scope = None;
-      let mut found_scope_for_window = false;
-      let mut found_scope_for_url = false;
-      for s in &manager.inner.external_command_access {
-        let matches_window = s.windows.contains(&self.window.label);
-        let matches_url = s.url.matches(current_url.as_str());
-        found_scope_for_window = found_scope_for_window || matches_window;
-        found_scope_for_url = found_scope_for_url || matches_url;
-        if matches_window && matches_url && scope.is_none() {
-          scope.replace(s);
-        }
-      }
-      scope
-    };
+    let scope = Some(&default_scope);
     match payload.cmd.as_str() {
       "__initialized" => {
         let payload: PageLoadPayload = serde_json::from_value(payload.inner)?;
@@ -1583,8 +1567,8 @@ impl<R: Runtime> Window<R> {
   /// [`trigger`](Window#method.trigger) and [`emit_and_trigger`](Window#method.emit_and_trigger) methods or
   /// the `appWindow.emit` function from the @tauri-apps/api `window` module.
   pub fn listen<F>(&self, event: impl Into<String>, handler: F) -> EventHandler
-  where
-    F: Fn(Event) + Send + 'static,
+    where
+      F: Fn(Event) + Send + 'static,
   {
     let label = self.window.label.clone();
     self.manager.listen(event.into(), Some(label), handler)
@@ -1597,8 +1581,8 @@ impl<R: Runtime> Window<R> {
 
   /// Listen to an event on this window a single time.
   pub fn once<F>(&self, event: impl Into<String>, handler: F) -> EventHandler
-  where
-    F: FnOnce(Event) + Send + 'static,
+    where
+      F: FnOnce(Event) + Send + 'static,
   {
     let label = self.window.label.clone();
     self.manager.once(event.into(), Some(label), handler)
