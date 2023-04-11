@@ -1372,17 +1372,6 @@ impl<R: Runtime> Window<R> {
             manager.package_info(),
           );
         } else if payload.cmd.starts_with("plugin:") {
-          if !is_local {
-            let command = invoke.message.command.replace("plugin:", "");
-            let plugin_name = command.split('|').next().unwrap().to_string();
-            if !scope
-              .map(|s| s.plugins.contains(&plugin_name))
-              .unwrap_or(true)
-            {
-              invoke.resolver.reject("Plugin not allowed");
-              return Ok(());
-            }
-          }
           manager.extend_api(invoke);
         } else {
           manager.run_invoke_handler(invoke);
